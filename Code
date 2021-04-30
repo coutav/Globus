@@ -1,0 +1,359 @@
+#include <iostream>
+#include <fstream>
+#include <conio.h>
+#include <stdio.h>
+#include <string>
+#include <string.h>
+#include <ctype.h>
+#include <Windows.h>
+
+using namespace std;
+
+int choice; 
+char op;
+
+using namespace std;
+
+/* Function prototypes */
+int menu();  
+int signup();
+int login();
+int about_globus();
+int wall();
+int game();
+int passive();
+
+/* struct for data storage */
+struct data
+{
+	char first_name[10], last_name[10], username[15], password[30]; 
+	int birth_date, birth_month;
+	long int birth_year;
+}d;
+
+
+int main()
+{
+	cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n                                                    GLOBUS SERVICES";
+	cout << "\n\n                                               Press any key to continue...";
+	_getch();  //if key is pressed 
+	menu();
+	return 0;
+}
+
+int menu()
+{
+	system("CLS");
+	cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\                                                  1. SIGN UP \n";
+	cout << "                                                  2. LOGIN\n";
+	cout << "                                                  3. ABOUT GLOBUS\n";
+	cout << "                                                  4. GAME\n";
+	cin >> choice;
+
+	switch (choice) {
+	case 1:
+		signup();
+		break;
+	case 2:
+		login();
+		break;
+	case 3:
+		about_globus();
+		break;
+	case 4:
+		game();
+		break;
+	case 5: passive();
+	default:
+		cout << "Invalid choice!";
+		_getch();
+		menu();
+	}
+	return 0;
+}
+
+int signup()
+{
+	int i = 0;  //for displaying password as *
+	char a; 
+	//string username, password;
+	ofstream read_write_data("data.dat", ios::out | ios::app | ios::binary);  //creating the output file
+	system("CLS");
+	cout << "                                                         GLOBUS SIGNUP\n\n\n\n\n\n\n";
+	cout << "						Enter your first name: ";
+	cin >> d.first_name;
+
+	if (strlen(d.first_name) < 3)
+	{
+		cout << "\n						Are you sure that your first name is authentic? (Y/N)";
+		cin >> op;
+		switch (op) {
+		case 'Y':
+			break;
+		case 'y':
+			break;
+		case 'N':
+			signup();
+		case 'n':
+			signup();
+		}
+	}
+		
+
+
+	if (islower(d.first_name[0]))
+		d.first_name[0]=toupper(d.first_name[0]);
+
+	cout << "\n						Enter your last name: ";
+	cin >> d.last_name;
+	
+	if (strlen(d.last_name) < 3)
+	{
+		cout << "\n						Are you sure that your last name is authentic? (Y/N)";
+		cin >> op;
+		switch (op) {
+		case 'Y':
+			break;
+		case 'y':
+			break;
+		case 'N':
+			exit(1);
+		case 'n':
+			exit(1);
+		}
+		
+	}
+
+	if (islower(d.last_name[0]))
+		d.last_name[0] = toupper(d.last_name[0]);
+
+	cout << "\n						Enter your birth date(DD): ";
+	cin >> d.birth_date;
+	
+	if (d.birth_date < 1 || d.birth_date > 31)
+	{
+		cout << "\n						Invalid Input!";
+		cout << "\n						Do you want to try again? (Y/N)";
+		cin >> op;
+		if (op == 'y' || op == 'Y')
+			signup();
+		else if (op == 'n' || op == 'N')
+			exit(1);
+	}
+	else
+	{
+		cout << "\n						Enter your birth month(MM): ";
+		cin >> d.birth_month;
+
+		if (d.birth_month < 1 || d.birth_month > 12)
+		{
+			cout << "\n						Invalid Input!";
+			cout << "\n						Do you want to try again? (Y/N)";
+			cin >> op;
+			if (op == 'y' || op == 'Y')
+				signup();
+			else if (op == 'n' || op == 'N')
+				exit(1);
+		}
+		else
+		{
+			cout << "\n						Enter your birth year(YYYY): ";
+			cin >> d.birth_year;
+
+			if (d.birth_year < 1907 || d.birth_year > 2007)
+			{
+				cout << "\n					  Sorry, you are not eligible to use GLOBUS!";
+				cout << "\n\n						Do you want to try again? (Y/N)";
+				cin >> op;
+				if (op == 'y' || op == 'Y')
+					signup();
+				else if (op == 'n' || op == 'N')
+					exit(1);
+			}
+
+			if (d.birth_date == 29 && d.birth_month == 2)
+			{
+				if ((d.birth_year % 4) == 0)
+					goto next;
+				else
+				{
+					cout << "\n						This date does not exist. Please try again!";
+					_getch();
+					signup();
+				}
+			}
+			next:
+			cout << "\n						Create a username for youself: @";
+			cin >> d.username;
+			
+			cout << "\n						Choose a password for your account: ";
+			for (i = 0;;) {
+				a = _getch();
+
+				if ((a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z') || (a >= '0' && a <= '9'))
+				{
+					d.password[i] = a;  //stores a in pass
+					++i;
+					cout << "*";
+				}
+				if (a == '\b' && i >= 1)  //if user typed backspace
+										  //i should be greater than 1.
+				{
+					cout << "\b \b";  //rub the character behind the cursor.
+					--i;
+				}
+				if (a == '\r')  //if enter is pressed
+				{
+					d.password[i] = '\0';  //null means end of string.
+					read_write_data.write((char*)&d, sizeof(d));  //writing the data in the file
+					read_write_data.close();  //closing the file
+					cout << "\n             Congratulations! Your account has been created.";
+					cout << "\n             Press Enter to proceed....";
+					op = _getch();
+					if (op == '\r')
+						wall();
+			
+				}
+			}
+			
+		}
+	}
+	
+	return 0;
+}
+
+
+int login()
+{
+	system("CLS");
+	char user[15], pass[30];
+	int i;
+	system("CLS");
+	
+	cout << "\n\n                    Enter your username: @";
+	cin >> user;
+	cout << "\n\n                    Enter your password: ";
+
+	for (i = 0;;) {
+		op = _getch();
+
+		if ((op >= 'a' && op <= 'z') || (op >= 'A' && op <= 'Z') || (op >= '0' && op <= '9'))
+		{
+			pass[i] = op;  //stores a in pass
+			++i;
+			cout << "*";
+		}
+		if (op == '\b' && i >= 1)  //if user typed backspace
+								  //i should be greater than 1.
+		{
+			cout << "\b \b";  //rub the character behind the cursor.
+			--i;
+		}
+		if (op == '\r')  //if enter is pressed
+		{
+			pass[i] = '\0';  //null means end of string.
+			break;
+
+		}
+	}
+	
+	ifstream read_data1("data.dat", ios::in | ios::binary);  //taking input of the data file
+	while (read_data1.read((char*)&d, sizeof(d)))
+	{
+
+		if (strcmp(d.username, user) == 0)
+		{
+			if (strcmp(d.password, pass) == 0)
+			{
+				
+				cout << "\n				Login successful! Press Enter to continue.";
+				op = _getch();
+				if (op == '\r')
+					wall();
+			}
+			else
+			{
+				cout << "\n\nEither the username or password is incorrect! Want to try again? (Y/N)";
+				cin >> op;
+				if (op == 'y' || op == 'Y')
+					login();
+				else
+					menu();
+				
+			}
+
+		}
+
+	}
+	read_data1.close();
+	
+	return 0;
+}
+
+int about_globus()
+{
+	system("CLS");
+	cout << "kofmkmekorgmokerm globus";
+	return 0;
+}
+
+int wall()
+{
+	system("CLS");
+	cout << "\n								GLOBUS";
+	cout << "\n\n\n                         1. Discussion Wall";
+	cin >> choice;
+	if (choice == 1)
+	{
+		STARTUPINFO startInfo = { 0 };
+
+		PROCESS_INFORMATION processInfo = { 0 };
+
+		BOOL bScucces = CreateProcess(TEXT("C:\\Windows\\notepad.exe"), NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &startInfo, &processInfo);
+
+		if (bScucces) 
+		{
+			cout << "Process started!";
+		}
+		else
+		{
+			cout << "Error!";
+		}
+
+		cin.get();
+	}
+	return 0;
+}
+
+int game()
+{
+	STARTUPINFO startInfo = { 0 };
+
+	PROCESS_INFORMATION processInfo = { 0 };
+
+	BOOL bScucces = CreateProcess(TEXT("C:\\Users\\ankit\\source\\repos\\opengl\\Debug\\opengl.exe"), NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &startInfo, &processInfo);
+
+	if (bScucces)
+	{
+		cout << "Process started!";
+	}
+	else
+	{
+		cout << "Error!";
+	}
+
+	cin.get();
+
+	return 0;
+}
+
+int passive()
+{
+	ifstream read_data("data.dat", ios::binary | ios::in);
+	while (read_data.read((char*)&d, sizeof(d)))
+	{
+		cout << d.first_name << d.last_name << d.username;
+	}read_data.close();
+	return 0;
+}
+
